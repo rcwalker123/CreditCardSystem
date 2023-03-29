@@ -20,10 +20,6 @@ namespace CreditCardSystem.Models
 
         public virtual DbSet<CardType> CardType { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-        }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<CardType>(entity =>

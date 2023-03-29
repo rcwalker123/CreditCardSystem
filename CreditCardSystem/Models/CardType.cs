@@ -9,5 +9,6 @@ namespace CreditCardSystem.Models
     {
         public Guid CardTypeId { get; set; }
         public string CardTypeName { get; set; }
+        public bool IsActive { get; set; }
     }
 }
