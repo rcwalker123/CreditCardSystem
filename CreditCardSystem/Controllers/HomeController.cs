@@ -17,10 +17,6 @@ namespace CreditCardSystem.Controllers
 
         public IActionResult Index()
         {
-            _dbContext.CardType.Add(new CardType { CardTypeId = Guid.NewGuid(), CardTypeName = "VISA" });
-            _dbContext.CardType.Add(new CardType { CardTypeId = Guid.NewGuid(), CardTypeName = "AMEX" });
-            _dbContext.CardType.Add(new CardType { CardTypeId = Guid.NewGuid(), CardTypeName = "MasterCard" });
-            _dbContext.CardType.Add(new CardType { CardTypeId = Guid.NewGuid(), CardTypeName = "Discover" });
             return View();
         }
 
