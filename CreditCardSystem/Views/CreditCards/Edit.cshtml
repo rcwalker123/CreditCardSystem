@@ -1,0 +1,49 @@
+﻿@model CreditCardSystem.Models.CreditCard
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>CreditCard</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="CreditCardId" />
+            <div class="form-group">
+                <label asp-for="CardNumber" class="control-label"></label>
+                <input asp-for="CardNumber" class="form-control" />
+                <span asp-validation-for="CardNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CardExpiry" class="control-label"></label>
+                <input asp-for="CardExpiry" class="form-control" />
+                <span asp-validation-for="CardExpiry" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CardCvv" class="control-label"></label>
+                <input asp-for="CardCvv" class="form-control" />
+                <span asp-validation-for="CardCvv" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CardTypeId" class="control-label"></label>
+                <select asp-for="CardTypeId" class="form-control" asp-items="ViewBag.CardTypeId"></select>
+                <span asp-validation-for="CardTypeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

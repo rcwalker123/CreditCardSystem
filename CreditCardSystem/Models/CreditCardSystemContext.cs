@@ -19,6 +19,8 @@ namespace CreditCardSystem.Models
         }
 
         public virtual DbSet<CardType> CardType { get; set; }
+        public virtual DbSet<CreditCard> CreditCard { get; set; }
+        public virtual DbSet<ValidationRegex> ValidationRegex { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -30,6 +32,48 @@ namespace CreditCardSystem.Models
                     .IsRequired()
                     .HasMaxLength(20)
                     .IsFixedLength();
+
+                entity.HasOne(d => d.ValidationRegex)
+                    .WithMany(p => p.CardType)
+                    .HasForeignKey(d => d.ValidationRegexId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__CardType__Valida__5FB337D6");
+            });
+
+            modelBuilder.Entity<CreditCard>(entity =>
+            {
+                entity.Property(e => e.CreditCardId).ValueGeneratedNever();
+
+                entity.Property(e => e.CardCvv)
+                    .IsRequired()
+                    .HasMaxLength(4)
+                    .HasColumnName("CardCVV")
+                    .IsFixedLength();
+
+                entity.Property(e => e.CardExpiry).HasColumnType("date");
+
+                entity.Property(e => e.CardNumber)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.HasOne(d => d.CardType)
+                    .WithMany(p => p.CreditCard)
+                    .HasForeignKey(d => d.CardTypeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_CreditCard_CardType");
+            });
+
+            modelBuilder.Entity<ValidationRegex>(entity =>
+            {
+                entity.Property(e => e.ValidationRegexId).ValueGeneratedNever();
+
+                entity.Property(e => e.ValidationRegexName)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.ValidationRegexString)
+                    .IsRequired()
+                    .HasMaxLength(100);
             });
 
             OnModelCreatingPartial(modelBuilder);

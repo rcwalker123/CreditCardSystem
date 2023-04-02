@@ -21,9 +21,8 @@ namespace CreditCardSystem.Controllers
         // GET: CardTypes
         public async Task<IActionResult> Index()
         {
-              return _context.CardType != null ? 
-                          View(await _context.CardType.ToListAsync()) :
-                          Problem("Entity set 'CreditCardSystemContext.CardType'  is null.");
+            var creditCardSystemContext = _context.CardType.Include(c => c.ValidationRegex);
+            return View(await creditCardSystemContext.ToListAsync());
         }
 
         // GET: CardTypes/Details/5
@@ -35,6 +34,7 @@ namespace CreditCardSystem.Controllers
             }
 
             var cardType = await _context.CardType
+                .Include(c => c.ValidationRegex)
                 .FirstOrDefaultAsync(m => m.CardTypeId == id);
             if (cardType == null)
             {
@@ -47,6 +47,7 @@ namespace CreditCardSystem.Controllers
         // GET: CardTypes/Create
         public IActionResult Create()
         {
+            ViewData["ValidationRegexId"] = new SelectList(_context.ValidationRegex, "ValidationRegexId", "ValidationRegexString");
             return View();
         }
 
@@ -55,7 +56,7 @@ namespace CreditCardSystem.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CardTypeId,CardTypeName,IsActive")] CardType cardType)
+        public async Task<IActionResult> Create([Bind("CardTypeId,CardTypeName,IsActive,ValidationRegexId")] CardType cardType)
         {
             if (ModelState.IsValid)
             {
@@ -64,6 +65,7 @@ namespace CreditCardSystem.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["ValidationRegexId"] = new SelectList(_context.ValidationRegex, "ValidationRegexId", "ValidationRegexString", cardType.ValidationRegexId);
             return View(cardType);
         }
 
@@ -80,6 +82,7 @@ namespace CreditCardSystem.Controllers
             {
                 return NotFound();
             }
+            ViewData["ValidationRegexId"] = new SelectList(_context.ValidationRegex, "ValidationRegexId", "ValidationRegexString", cardType.ValidationRegexId);
             return View(cardType);
         }
 
@@ -88,7 +91,7 @@ namespace CreditCardSystem.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("CardTypeId,CardTypeName,IsActive")] CardType cardType)
+        public async Task<IActionResult> Edit(Guid id, [Bind("CardTypeId,CardTypeName,IsActive,ValidationRegexId")] CardType cardType)
         {
             if (id != cardType.CardTypeId)
             {
@@ -115,6 +118,7 @@ namespace CreditCardSystem.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["ValidationRegexId"] = new SelectList(_context.ValidationRegex, "ValidationRegexId", "ValidationRegexString", cardType.ValidationRegexId);
             return View(cardType);
         }
 
@@ -127,6 +131,7 @@ namespace CreditCardSystem.Controllers
             }
 
             var cardType = await _context.CardType
+                .Include(c => c.ValidationRegex)
                 .FirstOrDefaultAsync(m => m.CardTypeId == id);
             if (cardType == null)
             {

@@ -24,6 +24,11 @@
                 </label>
             </div>
             <div class="form-group">
+                <label asp-for="ValidationRegexId" class="control-label"></label>
+                <select asp-for="ValidationRegexId" class="form-control" asp-items="ViewBag.ValidationRegexId"></select>
+                <span asp-validation-for="ValidationRegexId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>

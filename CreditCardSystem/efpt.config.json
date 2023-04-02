@@ -17,6 +17,14 @@
       {
          "Name": "[dbo].[CardType]",
          "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[CreditCard]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ValidationRegex]",
+         "ObjectType": 0
       }
    ],
    "UiHint": "RAUVOUN-PC\\SQLEXPRESS.CreditCardSystem",

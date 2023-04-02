@@ -7,8 +7,17 @@ namespace CreditCardSystem.Models
 {
     public partial class CardType
     {
+        public CardType()
+        {
+            CreditCard = new HashSet<CreditCard>();
+        }
+
         public Guid CardTypeId { get; set; }
         public string CardTypeName { get; set; }
         public bool IsActive { get; set; }
+        public Guid ValidationRegexId { get; set; }
+
+        public virtual ValidationRegex ValidationRegex { get; set; }
+        public virtual ICollection<CreditCard> CreditCard { get; set; }
     }
 }
