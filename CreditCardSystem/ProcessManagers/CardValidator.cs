@@ -5,14 +5,14 @@ namespace CreditCardSystem.ProcessManagers
 {
     public class CardValidator : ICardValidator
     {
-        public bool ValidateCardNumber(string cardNumber)
+        public bool ValidateCardNumber(string cardNumber, string regex)
         {
-            throw new NotImplementedException();
+            return Regex.IsMatch(cardNumber, regex);
         }
 
         public bool ValidateCVV(string cvv)
         {
-            return Regex.IsMatch(cvv, "^[0-9][3,4]$");
+            return Regex.IsMatch(cvv, "^[0-9]{3,4}$");
         }
 
         public bool ValidateDate(DateTime date)

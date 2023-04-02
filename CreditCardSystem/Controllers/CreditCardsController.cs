@@ -14,10 +14,12 @@ namespace CreditCardSystem.Controllers
     public class CreditCardsController : Controller
     {
         private readonly CreditCardSystemContext _context;
+        private readonly ICardValidator _validator;
 
         public CreditCardsController(CreditCardSystemContext context, ICardValidator validator)
         {
             _context = context;
+            _validator = validator;
         }
 
         // GET: CreditCards
@@ -60,24 +62,59 @@ namespace CreditCardSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("CreditCardId,CardNumber,CardExpiry,CardCvv,CardTypeId")] CreditCard creditCard)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                //Encrypt
-                var encryptedCardNumber = Encryption.Encrypt(creditCard.CardNumber);
+                var cardNumberValidator = false;
+                var regexId = _context.CardType.FirstOrDefault(x => x.CardTypeId == creditCard.CardTypeId)?.ValidationRegexId;
+                if(regexId != null)
+                {
+                    var regex = _context.ValidationRegex.FirstOrDefault(x => x.ValidationRegexId == regexId);
+                    var cardNumber = creditCard.CardNumber.Replace("-", "").Replace(" ", "");
+                    cardNumberValidator = _validator.ValidateCardNumber(cardNumber, regex.ValidationRegexString);
+                }
+                
+                var dateValidator = _validator.ValidateDate(creditCard.CardExpiry);
+                var cvvValidator = _validator.ValidateCVV(creditCard.CardCvv);
+                
 
-                //Check if card number exists
-                ModelState.AddModelError(nameof(CreditCard.CardNumber), $"{creditCard.CardNumber} already exists");
-                return View(creditCard);
-                //if (cardFromDb != null)
-                //{
-                //    ModelState.AddModelError(nameof(CreditCard.CardNumber), $"{creditCard.CardNumber} already exists");
-                //    return View(creditCard);
-                //}
-                creditCard.CreditCardId = Guid.NewGuid();
-                //_context.Add(creditCard);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (!dateValidator)
+                {
+                    ViewBag.DateError = "Please enter a date from now";
+                }
+
+                if (!cvvValidator)
+                {
+                    ViewBag.CvvError = "Please enter a date from now";
+                }
+
+                if (!cardNumberValidator)
+                {
+                    ViewBag.CardNumberError = "Please enter a valid card number";
+                }
+                
+                if (!cvvValidator || !dateValidator || !cardNumberValidator)
+                {
+                    ViewData["CardTypeId"] = new SelectList(_context.CardType, "CardTypeId", "CardTypeName", creditCard.CardTypeId);
+                    return View(creditCard);
+                }
+                   
             }
+            //Encrypt
+            var encryptedCardNumber = Encryption.Encrypt(creditCard.CardNumber);
+
+            //Check if card number exists
+            ModelState.AddModelError(nameof(CreditCard.CardNumber), $"{creditCard.CardNumber} already exists");
+            return View(creditCard);
+            //if (cardFromDb != null)
+            //{
+            //    ModelState.AddModelError(nameof(CreditCard.CardNumber), $"{creditCard.CardNumber} already exists");
+            //    return View(creditCard);
+            //}
+            creditCard.CreditCardId = Guid.NewGuid();
+            //_context.Add(creditCard);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+
             ViewData["CardTypeId"] = new SelectList(_context.CardType, "CardTypeId", "CardTypeName", creditCard.CardTypeId);
             return View(creditCard);
         }
@@ -168,14 +205,14 @@ namespace CreditCardSystem.Controllers
             {
                 _context.CreditCard.Remove(creditCard);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool CreditCardExists(Guid id)
         {
-          return (_context.CreditCard?.Any(e => e.CreditCardId == id)).GetValueOrDefault();
+            return (_context.CreditCard?.Any(e => e.CreditCardId == id)).GetValueOrDefault();
         }
     }
 }

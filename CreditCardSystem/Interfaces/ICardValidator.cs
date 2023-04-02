@@ -4,7 +4,7 @@
     {
         public bool ValidateDate(DateTime date);
         public bool ValidateCVV(string cvv);
-        public bool ValidateCardNumber(string cardNumber);
+        public bool ValidateCardNumber(string cardNumber, string regex);
 
     }
 }

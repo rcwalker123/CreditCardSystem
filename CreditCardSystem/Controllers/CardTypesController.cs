@@ -47,7 +47,7 @@ namespace CreditCardSystem.Controllers
         // GET: CardTypes/Create
         public IActionResult Create()
         {
-            ViewData["ValidationRegexId"] = new SelectList(_context.ValidationRegex, "ValidationRegexId", "ValidationRegexString");
+            ViewData["ValidationRegexId"] = new SelectList(_context.ValidationRegex, "ValidationRegexId", "ValidationRegexName");
             return View();
         }
 

@@ -2,6 +2,7 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace CreditCardSystem.Models
 {
@@ -13,10 +14,12 @@ namespace CreditCardSystem.Models
         }
 
         public Guid CardTypeId { get; set; }
+        [Display(Name = "Card Type Name")]
         public string CardTypeName { get; set; }
         public bool IsActive { get; set; }
         public Guid ValidationRegexId { get; set; }
 
+        [Display(Name = "Selected Provider to validate against")]
         public virtual ValidationRegex ValidationRegex { get; set; }
         public virtual ICollection<CreditCard> CreditCard { get; set; }
     }
