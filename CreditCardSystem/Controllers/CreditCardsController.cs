@@ -99,24 +99,23 @@ namespace CreditCardSystem.Controllers
                 }
                    
             }
-            //Encrypt
-            var encryptedCardNumber = Encryption.Encrypt(creditCard.CardNumber);
 
-            //Check if card number exists
-            ModelState.AddModelError(nameof(CreditCard.CardNumber), $"{creditCard.CardNumber} already exists");
-            return View(creditCard);
-            //if (cardFromDb != null)
-            //{
-            //    ModelState.AddModelError(nameof(CreditCard.CardNumber), $"{creditCard.CardNumber} already exists");
-            //    return View(creditCard);
-            //}
+            //Normally we would encrypt the card number to prevent storing it in plaintext
+            
+            var creditCardFromDb = _context.CreditCard.FirstOrDefault(x => x.CardNumber == creditCard.CardNumber);
+
+            if (creditCardFromDb != null)
+            {
+                ViewBag.CardNumberError = "This card has already been captured";
+
+                ViewData["CardTypeId"] = new SelectList(_context.CardType, "CardTypeId", "CardTypeName", creditCard.CardTypeId);
+                return View(creditCard);
+            }
+
             creditCard.CreditCardId = Guid.NewGuid();
-            //_context.Add(creditCard);
+            _context.Add(creditCard);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-
-            ViewData["CardTypeId"] = new SelectList(_context.CardType, "CardTypeId", "CardTypeName", creditCard.CardTypeId);
-            return View(creditCard);
         }
 
         // GET: CreditCards/Edit/5
