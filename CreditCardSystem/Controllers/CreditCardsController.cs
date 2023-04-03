@@ -62,21 +62,16 @@ namespace CreditCardSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("CreditCardId,CardNumber,CardExpiry,CardCvv,CardTypeId")] CreditCard creditCard)
         {
-            if (!ModelState.IsValid)
-            {
+  
                 var cardNumberValidator = false;
-                var regexId = _context.CardType.FirstOrDefault(x => x.CardTypeId == creditCard.CardTypeId)?.ValidationRegexId;
-                if(regexId != null)
-                {
-                    var regex = _context.ValidationRegex.FirstOrDefault(x => x.ValidationRegexId == regexId);
-                    var cardNumber = creditCard.CardNumber.Replace("-", "").Replace(" ", "");
-                    cardNumberValidator = _validator.ValidateCardNumber(cardNumber, regex.ValidationRegexString);
-                }
-                
+                CardType? matchedProvider = null;
+
+                var cardNumber = creditCard.CardNumber.Replace("-", "").Replace(" ", "");
+                (cardNumberValidator, matchedProvider) = _validator.ValidateCardNumber(cardNumber);
+    
                 var dateValidator = _validator.ValidateDate(creditCard.CardExpiry);
                 var cvvValidator = _validator.ValidateCVV(creditCard.CardCvv);
                 
-
                 if (!dateValidator)
                 {
                     ViewBag.DateError = "Please enter a date from now";
@@ -89,16 +84,14 @@ namespace CreditCardSystem.Controllers
 
                 if (!cardNumberValidator)
                 {
-                    ViewBag.CardNumberError = "Please enter a valid card number";
+                    ViewBag.CardNumberError = "Please enter a valid card number for an active card type";
                 }
                 
                 if (!cvvValidator || !dateValidator || !cardNumberValidator)
                 {
-                    ViewData["CardTypeId"] = new SelectList(_context.CardType, "CardTypeId", "CardTypeName", creditCard.CardTypeId);
                     return View(creditCard);
                 }
-                   
-            }
+                
 
             //Normally we would encrypt the card number to prevent storing it in plaintext
             
@@ -107,12 +100,12 @@ namespace CreditCardSystem.Controllers
             if (creditCardFromDb != null)
             {
                 ViewBag.CardNumberError = "This card has already been captured";
-
-                ViewData["CardTypeId"] = new SelectList(_context.CardType, "CardTypeId", "CardTypeName", creditCard.CardTypeId);
+;
                 return View(creditCard);
             }
 
             creditCard.CreditCardId = Guid.NewGuid();
+            creditCard.CardTypeId = matchedProvider.CardTypeId;
             _context.Add(creditCard);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

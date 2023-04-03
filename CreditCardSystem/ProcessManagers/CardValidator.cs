@@ -1,13 +1,36 @@
 ﻿using CreditCardSystem.Interfaces;
+using CreditCardSystem.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 
 namespace CreditCardSystem.ProcessManagers
 {
     public class CardValidator : ICardValidator
     {
-        public bool ValidateCardNumber(string cardNumber, string regex)
+        private readonly CreditCardSystemContext _context;
+        public CardValidator(CreditCardSystemContext context) 
         {
-            return Regex.IsMatch(cardNumber, regex);
+            _context = context;
+        }
+        public (bool, CardType?) ValidateCardNumber(string cardNumber)
+        {
+            var providers = _context.CardType.Where(x => x.IsActive).Include("ValidationRegex");
+
+            CardType? matchedProvider = null;
+            bool isValid = false;
+
+            foreach (var provider in providers)
+            {
+                var regexResult = Regex.IsMatch(cardNumber, provider.ValidationRegex.ValidationRegexString);
+
+                if (regexResult)
+                {
+                    isValid = true;
+                    matchedProvider = provider;
+                    break;
+                }
+            }
+            return (isValid, matchedProvider);
         }
 
         public bool ValidateCVV(string cvv)

@@ -59,6 +59,7 @@ namespace CreditCardSystem.Controllers
         {
             if (ModelState.IsValid)
             {
+                //TODO: check that regex hasn't been used and is valid regex
                 validationRegex.ValidationRegexId = Guid.NewGuid();
                 _context.Add(validationRegex);
                 await _context.SaveChangesAsync();

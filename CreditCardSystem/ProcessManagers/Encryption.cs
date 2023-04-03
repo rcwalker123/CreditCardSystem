@@ -4,7 +4,6 @@ namespace CreditCardSystem.ProcessManagers
 {
     public static class Encryption
     {
-        //TODO: Implement
         public static byte[] Decrypt(string ciphertext)
         {
             throw new NotImplementedException();

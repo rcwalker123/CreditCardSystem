@@ -47,7 +47,12 @@ namespace CreditCardSystem.Controllers
         // GET: CardTypes/Create
         public IActionResult Create()
         {
-            ViewData["ValidationRegexId"] = new SelectList(_context.ValidationRegex, "ValidationRegexId", "ValidationRegexName");
+            //Only show non used providers
+            var usedRegexes = _context.CardType.Select(s => s.ValidationRegexId).Distinct();
+
+            var unusedRegexes = _context.ValidationRegex.Where(c => !usedRegexes.Contains(c.ValidationRegexId));
+
+            ViewData["ValidationRegexId"] = new SelectList(unusedRegexes, "ValidationRegexId", "ValidationRegexName");
             return View();
         }
 

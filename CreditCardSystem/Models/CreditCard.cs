@@ -22,9 +22,6 @@ namespace CreditCardSystem.Models
         [Required]
         public string CardCvv { get; set; }
         public Guid CardTypeId { get; set; }
-
-        [Display(Name = "Card Type")]
-        [Required]
         public virtual CardType CardType { get; set; }
     }
 }
