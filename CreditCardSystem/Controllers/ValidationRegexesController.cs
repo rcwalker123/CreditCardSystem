@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CreditCardSystem.Models;
+using CreditCardSystem.ProcessManagers;
+using CreditCardSystem.Interfaces;
 
 namespace CreditCardSystem.Controllers
 {
@@ -59,7 +56,14 @@ namespace CreditCardSystem.Controllers
         {
             if (ModelState.IsValid)
             {
-                //TODO: check that regex hasn't been used and is valid regex
+                var regexFromDb = await _context.ValidationRegex.FirstOrDefaultAsync(x => x.ValidationRegexString == validationRegex.ValidationRegexString);
+
+                if(regexFromDb != null)
+                {
+                    ViewBag.ValidationRegexError = $"This Regular Expression already exists as: {regexFromDb.ValidationRegexName}";
+                    return View(validationRegex);
+
+                }
                 validationRegex.ValidationRegexId = Guid.NewGuid();
                 _context.Add(validationRegex);
                 await _context.SaveChangesAsync();
@@ -146,6 +150,14 @@ namespace CreditCardSystem.Controllers
             {
                 return Problem("Entity set 'CreditCardSystemContext.ValidationRegex'  is null.");
             }
+
+            var inUse = await _context.CardType.FirstOrDefaultAsync(x => x.ValidationRegexId == id) is not null;
+
+            if (inUse)
+            {
+                return View("DeleteError");
+            }
+
             var validationRegex = await _context.ValidationRegex.FindAsync(id);
             if (validationRegex != null)
             {

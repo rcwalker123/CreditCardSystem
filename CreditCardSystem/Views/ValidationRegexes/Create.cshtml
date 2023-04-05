@@ -14,6 +14,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="ValidationRegexString" class="control-label"></label>
+                <br /><span style="font-weight:Bold;">@ViewBag.ValidationRegexError</span>
                 <input asp-for="ValidationRegexString" class="form-control" />
                 <span asp-validation-for="ValidationRegexString" class="text-danger"></span>
             </div>

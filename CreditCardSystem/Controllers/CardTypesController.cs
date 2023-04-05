@@ -107,7 +107,10 @@ namespace CreditCardSystem.Controllers
             {
                 try
                 {
-                    _context.Update(cardType);
+                    var cardTypeModel = _context.CardType.First(x => x.CardTypeId == cardType.CardTypeId);
+
+                    cardTypeModel.IsActive = cardType.IsActive;
+                    _context.Update(cardTypeModel);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -155,6 +158,14 @@ namespace CreditCardSystem.Controllers
             {
                 return Problem("Entity set 'CreditCardSystemContext.CardType'  is null.");
             }
+
+            var inUse = await _context.CreditCard.FirstOrDefaultAsync(x => x.CardTypeId == id) is not null;
+
+            if (inUse)
+            {
+                return View("DeleteError");
+            }
+
             var cardType = await _context.CardType.FindAsync(id);
             if (cardType != null)
             {

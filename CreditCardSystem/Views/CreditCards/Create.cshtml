@@ -14,21 +14,20 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="CardNumber" class="control-label"></label>
-                <span style="font-weight:Bold;">@ViewBag.CardNumberError</span>
+                <br /><span style="font-weight:Bold;">@ViewBag.CardNumberError</span>
                 <input asp-for="CardNumber" class="form-control" />
                 <span asp-validation-for="CardNumber" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="CardExpiry" class="control-label"></label>
-                <br />
-                <span style="font-weight:Bold;">@ViewBag.DateError</span>
+                <br /><span style="font-weight:Bold;">@ViewBag.DateError</span>
                 @Html.TextBoxFor(m => m.CardExpiry, new { type = "month"})
                 <br />
                 <span asp-validation-for="CardExpiry" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="CardCvv" class="control-label"></label>
-                <span style="font-weight:Bold;">@ViewBag.CvvError</span>
+                <br /><span style="font-weight:Bold;">@ViewBag.CvvError</span>
                 <input asp-for="CardCvv" class="form-control" />
                 <span asp-validation-for="CardCvv" class="text-danger"></span>
             </div>

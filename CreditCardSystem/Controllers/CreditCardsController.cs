@@ -62,49 +62,51 @@ namespace CreditCardSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("CreditCardId,CardNumber,CardExpiry,CardCvv,CardTypeId")] CreditCard creditCard)
         {
-  
-                var cardNumberValidator = false;
-                CardType? matchedProvider = null;
 
-                var cardNumber = creditCard.CardNumber.Replace("-", "").Replace(" ", "");
-                (cardNumberValidator, matchedProvider) = _validator.ValidateCardNumber(cardNumber);
-    
-                var dateValidator = _validator.ValidateDate(creditCard.CardExpiry);
-                var cvvValidator = _validator.ValidateCVV(creditCard.CardCvv);
-                
-                if (!dateValidator)
-                {
-                    ViewBag.DateError = "Please enter a date from now";
-                }
+            var cardNumberValidator = false;
+            CardType? matchedProvider = null;
 
-                if (!cvvValidator)
-                {
-                    ViewBag.CvvError = "Please enter a date from now";
-                }
+            var cardNumber = creditCard.CardNumber.Replace("-", "").Replace(" ", "");
+            (cardNumberValidator, matchedProvider) = _validator.ValidateCardNumber(cardNumber);
 
-                if (!cardNumberValidator)
-                {
-                    ViewBag.CardNumberError = "Please enter a valid card number for an active card type";
-                }
-                
-                if (!cvvValidator || !dateValidator || !cardNumberValidator)
-                {
-                    return View(creditCard);
-                }
-                
+            var dateValidator = _validator.ValidateDate(creditCard.CardExpiry);
+            var cvvValidator = _validator.ValidateCVV(creditCard.CardCvv);
+
+            if (!dateValidator)
+            {
+                ViewBag.DateError = "Please enter a date from now";
+            }
+
+            if (!cvvValidator)
+            {
+                ViewBag.CvvError = "Please enter a date from now";
+            }
+
+            if (!cardNumberValidator || matchedProvider == null)
+            {
+                ViewBag.CardNumberError = "Please enter a valid card number for an active card type";
+            }
+
+            if (!cvvValidator || !dateValidator || !cardNumberValidator)
+            {
+                return View(creditCard);
+            }
+
 
             //Normally we would encrypt the card number to prevent storing it in plaintext
-            
-            var creditCardFromDb = _context.CreditCard.FirstOrDefault(x => x.CardNumber == creditCard.CardNumber);
+
+            var creditCardFromDb = await _context.CreditCard.FirstOrDefaultAsync(x => x.CardNumber == creditCard.CardNumber);
 
             if (creditCardFromDb != null)
             {
                 ViewBag.CardNumberError = "This card has already been captured";
-;
+                ;
                 return View(creditCard);
             }
 
             creditCard.CreditCardId = Guid.NewGuid();
+
+            //At this point we should not have a null matchedProvider as this is caught in the above if statements
             creditCard.CardTypeId = matchedProvider.CardTypeId;
             _context.Add(creditCard);
             await _context.SaveChangesAsync();
