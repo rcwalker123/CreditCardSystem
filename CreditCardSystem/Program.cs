@@ -8,11 +8,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-
-var connectionString = builder.Configuration.GetConnectionString("AppDb");
+var config = new ConfigurationBuilder()
+        .AddJsonFile("appsettings.json", optional: false)
+        .Build();
 
 builder.Services.AddDbContext<CreditCardSystemContext>(options =>
-    options.UseSqlServer("Data Source=localhost\\SQLEXPRESS;Initial Catalog=CreditCardSystem;Integrated Security=True;TrustServerCertificate=True"),
+    options.UseSqlServer(config.GetConnectionString("DefaultConnection")),
     optionsLifetime: ServiceLifetime.Scoped);
 
 builder.Services.AddScoped<ICardValidator, CardValidator>();

@@ -74,17 +74,22 @@ namespace CreditCardSystem.Controllers
 
             if (!dateValidator)
             {
-                ViewBag.DateError = "Please enter a date from now";
+                ViewBag.DateError = "Please enter a valid date";
             }
 
             if (!cvvValidator)
             {
-                ViewBag.CvvError = "Please enter a date from now";
+                ViewBag.CvvError = "Please enter a valid CVV";
             }
 
-            if (!cardNumberValidator || matchedProvider == null)
+            if (!cardNumberValidator)
             {
                 ViewBag.CardNumberError = "Please enter a valid card number for an active card type";
+            }
+
+            if (matchedProvider == null)
+            {
+                ViewBag.CardNumberError = "This Card Type is inactive or doesn't exist";
             }
 
             if (!cvvValidator || !dateValidator || !cardNumberValidator)
